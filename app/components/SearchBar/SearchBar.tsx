@@ -118,7 +118,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               size={20}
               color={theme.colors.text}
               onPress={() => {
-                if (isFocused) setSearchPhraseState('');
+                setSearchPhraseState('');
+                if (inputRef.current && !isFocused) {
+                  inputRef.current.focus();
+                }
               }}
             />
           </CloseIconContainer>
