@@ -1,12 +1,13 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Screen } from '@/components/screen/Screen';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
 import { screenName } from '@/navigators/screenName';
-import { useGetArtistInfo } from '@/services/api';
 import styled from '@emotion/native';
 import { ArtistHeader, DummyContainer, ArtistBlurHeader } from './components';
 import { Text, ErrorView } from '@/components';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { useGetArtistInfoQuery } from '@/services/apiRTK';
+import { skipToken } from '@reduxjs/toolkit/query';
 export const dummyArray = Array.from({ length: 30 }, (_, i) => `Item ${i + 1}`);
 
 interface ArtistScreenProps
@@ -16,17 +17,16 @@ export const ArtistScreen: FC<ArtistScreenProps> = ({
   navigation,
   route: { params },
 }) => {
-  const { data, error, isLoading, useFetchOneQuery } = useGetArtistInfo();
-
-  useEffect(() => {
-    if (params?.artistName) {
-      useFetchOneQuery(params?.artistName);
-    }
-  }, [params?.artistName, useFetchOneQuery]);
+  const {
+    data,
+    error,
+    isFetching: isLoading,
+    refetch,
+  } = useGetArtistInfoQuery(params.artistName ?? skipToken);
 
   const onRetryHandler = () => {
-    if (params?.albumName) {
-      useFetchOneQuery(params?.albumName);
+    if (params?.artistName) {
+      refetch();
     }
   };
 
@@ -66,7 +66,7 @@ export const ArtistScreen: FC<ArtistScreenProps> = ({
               </SkeletonPlaceholder>
             ))
           ) : (
-            <Text>{data?.bio.content}</Text>
+            <Text>{data?.artist?.bio.content}</Text>
           )}
         </Container>
         <ArtistBlurHeader

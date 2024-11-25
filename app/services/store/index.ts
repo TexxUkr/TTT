@@ -18,10 +18,11 @@ import {
 } from '@/utils/storage/storage';
 import { reactotron } from '@/devtools/ReactotronConfig';
 
-import { api } from '@/services/apiRTK';
+import { apiRTK } from '@/services/apiRTK';
 import { userReducer } from './user';
 
 const reducers = combineReducers({
+  [apiRTK.reducerPath]: apiRTK.reducer,
   user: userReducer,
 });
 
@@ -35,6 +36,7 @@ const persistConfig = {
   key: 'root',
   storage: reduxStorage,
   whitelist: ['theme', 'user'],
+  blacklist: [apiRTK.reducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);
@@ -48,7 +50,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(api.middleware);
+    }).concat(apiRTK.middleware);
     return middlewares;
   },
   devTools: process.env.NODE_ENV !== 'production',

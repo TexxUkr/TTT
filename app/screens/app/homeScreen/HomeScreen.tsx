@@ -1,10 +1,9 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { FlatList } from 'react-native';
 import { Text, ErrorView } from '@/components';
 import { Screen } from '@/components/screen/Screen';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
 import { screenName } from '@/navigators/screenName';
-import { useGetTopAlbums } from '@/services/api';
 import styled from '@emotion/native';
 import TopAlbumRecordItemSkeleton, {
   dummyArray as loadingDummyArray,
@@ -18,6 +17,8 @@ import {
 } from './components';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useGetTopAlbumsQuery } from '@/services/apiRTK';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
 const Container = styled(Screen)({
   flexDirection: 'column',
@@ -47,17 +48,17 @@ interface HomeScreenProps
 
 export const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
   const [artistName, setArtistName] = useState<string>();
-  const { data, error, isLoading, useFetchOneQuery } = useGetTopAlbums();
 
-  useEffect(() => {
-    if (artistName) {
-      useFetchOneQuery(artistName);
-    }
-  }, [artistName, useFetchOneQuery]);
+  const {
+    data,
+    error,
+    isFetching: isLoading,
+    refetch,
+  } = useGetTopAlbumsQuery(artistName ?? skipToken);
 
   const onRetryHandler = () => {
     if (artistName) {
-      useFetchOneQuery(artistName);
+      refetch();
     }
   };
 
@@ -118,7 +119,7 @@ export const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
           ListFooterComponent={<DummyAlbumItem />}
           showsVerticalScrollIndicator={false}
           refreshing={isLoading}
-          data={isLoading ? loadingDummyArray : data}
+          data={isLoading ? loadingDummyArray : data?.topalbums.album}
           renderItem={isLoading ? TopAlbumRecordItemSkeleton : renderItem}
         />
       )}

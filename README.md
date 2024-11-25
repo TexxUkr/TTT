@@ -48,13 +48,7 @@ And be able to see all tracks per album by the artist of choice.
   react-native-vector-icons
   and more...
 - Created screens and logic according to the task description
-
-# What has not been done
-
-- Currently some pages send request on mount.
-  Cashing is not implemented (will be done in future probably with RTK Query)
-  There is also an option to avoid unmount on blur, but I think caching is better
-  ...
+- Cashing is implemented with RTK Query
 
 # App running
 

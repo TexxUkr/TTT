@@ -1,9 +1,7 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { Screen } from '@/components/screen/Screen';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
-import { useAppTheme } from '@/utils/useAppTheme';
 import { screenName } from '@/navigators/screenName';
-import { useGetAlbumInfo } from '@/services/api';
 import styled from '@emotion/native';
 import { AlbumHeader, DummyContainer, AlbumBlurHeader } from './components';
 import { Text, ErrorView } from '@/components';
@@ -12,6 +10,8 @@ import TopAlbumRecordItemSkeleton, {
   dummyArray as loadingDummyArray,
 } from '@/components/TopAlbumRecordItemSkeleton';
 import { TrackItem, DummyTrackItem } from './components/TrackItem';
+import { useGetAlbumInfoQuery } from '@/services/apiRTK';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 const EmptyListContainer = styled.View({
   flexGrow: 1,
@@ -29,18 +29,16 @@ export const AlbumScreen: FC<AlbumScreenProps> = ({
   navigation,
   route: { params },
 }) => {
-  const { data, error, isLoading, resetQuery, useFetchOneQuery } =
-    useGetAlbumInfo();
-
-  useEffect(() => {
-    if (params?.albumMbid) {
-      useFetchOneQuery(params?.albumMbid);
-    }
-  }, [params?.albumMbid, useFetchOneQuery]);
+  const {
+    data,
+    error,
+    isFetching: isLoading,
+    refetch,
+  } = useGetAlbumInfoQuery(params.albumMbid ?? skipToken);
 
   const onRetryHandler = () => {
-    if (params?.albumMbid) {
-      useFetchOneQuery(params?.albumMbid);
+    if (params?.artistName) {
+      refetch();
     }
   };
 
@@ -93,7 +91,7 @@ export const AlbumScreen: FC<AlbumScreenProps> = ({
           ListFooterComponent={<DummyTrackItem />}
           showsVerticalScrollIndicator={false}
           refreshing={isLoading}
-          data={isLoading ? loadingDummyArray : data?.tracks.track}
+          data={isLoading ? loadingDummyArray : data?.album?.tracks.track}
           renderItem={isLoading ? TopAlbumRecordItemSkeleton : renderItem}
         />
       )}
