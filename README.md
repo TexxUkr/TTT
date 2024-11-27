@@ -52,6 +52,8 @@ And be able to see all tracks per album by the artist of choice.
 
 # App running
 
+!!! Please set the API URL and API KEY in the app.config.ts file !!!
+
 ## Step 1: Start the Metro Server
 
 First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
